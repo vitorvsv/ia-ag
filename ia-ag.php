@@ -1,186 +1,200 @@
 <?php
+/**
+ *  Algortimo Genético para encontrar o ponto de máximo para a função f(x) = sen(x)
+ *  f(x) resulta números entre 1 e -1 sendo 1 a solução perfeita e -1 a pior solução
+ *
+ *  Baseado em: https://integrada.minhabiblioteca.com.br/#/books/978-85-216-2936-8/cfi/6/56!/4/182/4@0:0
+ *
+ */
 
-$obj = new Algorithm();
+$pop = new Generations();
 
-class Algorithm
+class Generations
 {
-  public function __construct()
-  {
-    $this->run();
-  }   
-  
-  private $courses = [
-    0 => 'Institucional',
-    1 => 'Análise e desenvolvimento de sistemas',
-    2 => 'Contabilidade',
-  ];
+    const POPULATION_LENGHT = 4;
+    const GENERATIONS_LENGHT = 3;
 
-  private $subjects = [
-    0 => [
-      'name' => 'Leitura e produção de textos',
-      'depencies' => [],
-      'students' => 86,
-      'course' => 0,
-    ],
-    1 => [
-      'name' => 'Introdução a computação',
-      'depencies' => [0],
-      'students' => 22,
-      'course' => 1,
-    ],
-    2 => [
-      'name' => 'Matemática e estatística aplicada',
-      'depencies' => [0],
-      'students' => 77,
-      'course' => 0,
-    ],
-    3 => [
-      'name' => 'Análise e modelagem de dados',
-      'depencies' => [2],
-      'students' => 12,
-      'course' => 1,
-    ],
-    4 => [
-      'name' => 'Sistemas operacionais',
-      'depencies' => [3],
-      'students' => 14,
-      'course' => 1,
-    ],
-    5 => [
-      'name' => 'Modelos de gestão',
-      'depencies' => [0],
-      'students' => 65,
-      'course' => 2,
-    ],
-    6 => [
-      'name' => 'Contabilidade para não iniciantes',
-      'depencies' => [0],
-      'students' => 45,
-      'course' => 2,
-    ],
-    7 => [
-      'name' => 'Cálculo de finanças',
-      'depencies' => [6],
-      'students' => 33,
-      'course' => 2,
-    ],
-    8 => [
-      'name' => 'Economia',
-      'depencies' => [7],
-      'students' => 23,
-      'course' => 0,
-    ],
-  ];
-
-  private $classrooms = [
-    0 => [
-        'number' => '101',
-        'capability' => 30,
-        'building' => 3,
-    ],  
-    1 => [
-        'number' => '102',
-        'capability' => 30,
-        'building' => 3,
-    ],
-    2 => [
-        'number' => '103',
-        'capability' => 30,
-        'building' => 3,
-    ], 
-    3 => [
-        'number' => '104',
-        'capability' => 30,
-        'building' => 3,
-    ],
-    4 => [
-        'number' => '105',
-        'capability' => 30,
-        'building' => 3,
-    ],
-    5 => [
-        'number' => '101',
-        'capability' => 30,
-        'building' => 2,
-    ],
-    6 => [
-        'number' => '102',
-        'capability' => 30,
-        'building' => 2,
-    ],
-    7 => [
-        'number' => '103',
-        'capability' => 30,
-        'building' => 2,
-    ],
-    8 => [
-        'number' => '104',
-        'capability' => 30,
-        'building' => 2,
-    ],
-    9 => [
-        'number' => '105',
-        'capability' => 30,
-        'building' => 2,
-    ],
-  ];
-  
-  private $hours = [
-    0 => '08:00',
-    1 => '10:00',
-    2 => '13:00',
-    3 => '15:00',
-  ];
-
-  
-  // disciplina - sala de aula - hora
-  private $generations = [
-    // 0 => [ 
-    //   [0, 0, 0],
-    //   [0, 1, 0],
-    //   [0, 2, 0],
-    // ]
-  ];  
-  
-  private $COMBINATIONS = 200;
-  private $MAXINDIVIDUALS = 300;
-  private $MAXGENERATIONS = 100;
-    
-  public function run()
-  {
-    $this->generations[] = $this->generateIndividual();
-    print_r($this->generations);
-    
-  }
-
-
-  public function fitness()
-  {
-    
-  }
-  
-  public function generatePopulation(){
-    $generation = [];
-    for($i = 0; $i < $this->MAXINDIVIDUALS; $i++){
-      $individual = [];
-      for($j = 0; $j < $this->COMBINATIONS; $j++){
-        $individual[] = [
-          $this->random(0, count($this->subjects) - 1),
-          $this->random(0, count($this->classrooms) - 1),
-          $this->random(0, count($this->hours) - 1),
-        ];
-      }
-      $generation[] = $individual;
+    public function __construct()
+    {
+        $this->generations();
     }
-    $this->generations[] = $generation;
-    
-  }
-  
-  private function random($min, $max){
-    return (int) rand($min, $max);
-  }
-  
+
+    public function generations()
+    {
+//        $generations   = [];
+//        $generations[][] = $this->firstPopulation();
+        $generations[] = [
+            0 => [
+                '1001',
+                '0011',
+                '1010',
+                '0101',
+            ],
+        ];
+
+        //Generations
+        for ($g = 0; $g < self::GENERATIONS_LENGHT + 1; $g++) {
+
+            $newGeneration = [];
+
+            //Populations
+            for ($p = 0; $p < self::POPULATION_LENGHT; $p++) {
+                $fitness = [];
+                $totalFitness = 0;
+
+                //Chromossome
+                for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
+                    $fitnessUnique = $this->fitness($generations[$g][$p][$c]);
+                    $fitness[]     = $fitnessUnique;
+                    $totalFitness  += $fitnessUnique;
+                }
+
+                $taxFitness = $this->calcTaxFitness($fitness, $totalFitness);
+
+                for ($i = 0; $i < (self::POPULATION_LENGHT / 2); $i++) {
+                    //Selected chromossomes to change genetic
+                    $selectedChromossome      = $this->selectChromossome($taxFitness);
+                    $selectedOtherChromossome = $this->selectChromossome($taxFitness);
+
+                    $changed = $this->changeGenetic(
+                        $generations[$g][$p][$selectedChromossome],
+                        $generations[$g][$p][$selectedOtherChromossome]
+                    );
+
+                    $newGeneration[] = $changed[0];
+                    $newGeneration[] = $changed[1];
+                }
+            }
+
+            //Esta gerando uma população de 16!
+            
+            var_dump("<pre>",$newGeneration,"</pre>"); die;
+
+            $generations[] = $newGeneration;
+        }
+
+        var_dump("<pre>",$generations,"</pre>"); die;
+    }
+
+    public function population($populations)
+    {
+        $fitness       = [];
+        $totalFitness  = 0;
+        $taxFitnes     = [];
+
+        //Populations
+        for ($j = 0; $j < self::POPULATION_LENGHT; $j++) {
+             //Chromossome / individual
+            for ($k = 0; $k < self::POPULATION_LENGHT; $k++) {
+                //Fitness of chromossome
+//                $fitnessUnique        = $this->fitness($generations[$i][$j]);
+//                $fitness[$i][$j][$k]  = $fitnessUnique;
+//                $totalFitness        += $fitnessUnique;
+
+            }
+            $taxFitnes[] = $this->calcTaxFitness($fitness[$i], $totalFitness);
+            $totalFitness = 0;
+        }
+
+//        var_dump("<pre>",$generations[0], $fitness[0], $taxFitnes[0],"</pre>"); die;
+    }
+
+    // Generates the first generation with random numbers
+    public function firstPopulation()
+    {
+        $firstGeneration = [];
+
+        for ($i = 0; $i < self::POPULATION_LENGHT; $i++) {
+            $firstGeneration[] = $this->generateChromosome();
+        }
+
+        return $firstGeneration;
+    }
+
+    //Generates Chromosome (binaries between 0 - 15)
+    public function generateChromosome()
+    {
+        $rest      = rand(0, 15);
+        $mod       = $rest % 2;
+        $binNumber = [];
+
+        while ($rest != 0) {
+            $binNumber[] = $mod;
+            $rest = floor($rest / 2);
+            $mod = $rest % 2;
+        }
+
+        $binNumber = implode('', array_reverse($binNumber));
+        return str_pad($binNumber, 4 , 0, 0);
+    }
+
+    //Converts binaries numbers to decimal numbers
+    public function bin4Dec($bin)
+    {
+        $aux = 0;
+        $dec = 0;
+
+        for ($i = strlen($bin) - 1; $i >= 0; $i--) {
+            if ($bin[$i] == 1) {
+                $dec += 2**$aux;
+            }
+            $aux++;
+        }
+
+        return $dec;
+    }
+
+    //Function to avaliate the fitness of the chromossome
+    public function fitness($x)
+    {
+        $fit = 50 * (sin($this->bin4Dec($x)) + 1);
+        return round($fit, 2);
+    }
+
+    //Calculate the band on each fitness is
+    public function calcTaxFitness($fitness, $totalFitness)
+    {
+        $taxFitness = [];
+
+        foreach ($fitness as $fit) {
+            $taxFitness[]  = round(($fit / $totalFitness) * 100, 2);
+        }
+
+        return $taxFitness;
+    }
+
+    //Select an chromossome to change their genetic with other chromossome
+    public function selectChromossome($totalFitness)
+    {
+        $numberRandom = rand(0, 100);
+        $sum = 0;
+
+        for ($i = 0; $i < count($totalFitness); $i++) {
+            if ($sum >= $numberRandom) {
+                return $i;
+            }
+
+            $sum += $totalFitness[$i];
+        }
+
+        return 0;
+    }
+
+    //Modified the genetic to formate new chromossomes
+    public function changeGenetic($selectedChromossome, $selectedOtherChromossome)
+    {
+        $pointer = round(strlen($selectedChromossome) / 2, 2);
+
+        $geneticOnePartOne = substr($selectedChromossome, 0, $pointer);
+        $geneticOnePartTwo = substr($selectedChromossome, $pointer, strlen($selectedChromossome));
+        $geneticTwoPartOne = substr($selectedOtherChromossome, 0, $pointer);
+        $geneticTwoPartTwo = substr($selectedOtherChromossome, $pointer, strlen($selectedOtherChromossome));
+
+        $geneticModified = [
+            $geneticOnePartOne.$geneticTwoPartTwo,
+            $geneticTwoPartOne.$geneticOnePartTwo
+        ];
+
+        return $geneticModified;
+    }
 }
-
-?>
-
