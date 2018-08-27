@@ -12,7 +12,7 @@ $pop = new Generations();
 class Generations
 {
     const POPULATION_LENGHT = 4;
-    const GENERATIONS_LENGHT = 3;
+    const GENERATIONS_LENGHT = 5;
 
     public function __construct()
     {
@@ -25,78 +25,83 @@ class Generations
 //        $generations[][] = $this->firstPopulation();
         $generations[] = [
             0 => [
-                '1001',
+                '1001', // 9
                 '0011',
                 '1010',
                 '0101',
             ],
+//            0 => [
+//                '0101',
+//                '1010',
+//                '1111',
+//                '0000',
+//            ],
         ];
 
-        //Generations
-        for ($g = 0; $g < self::GENERATIONS_LENGHT + 1; $g++) {
+        $totalFitness = 0;
+        $arrFitness = [];
+        $newGeneration = [];
 
+        //segunda geração
+
+        //Chromossome
+        for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
+            $fitness = $this->fitness($generations[0][0][$c]);
+            $arrFitness[] = $fitness;
+            $totalFitness += $fitness;
+        }
+
+        $taxFitness = $this->calcTaxFitness($arrFitness, $totalFitness);
+
+        for ($c = 0; $c < self::POPULATION_LENGHT / 2; $c++) {
+            $selectedChromossome      = $this->selectChromossome($taxFitness);
+            $selectedOtherChromossome = $this->selectChromossome($taxFitness);
+
+            $changedGenetic = $this->changeGenetic(
+                $generations[0][0][$selectedChromossome],
+                $generations[0][0][$selectedOtherChromossome]
+            );
+
+            $newGeneration[] = $changedGenetic[0];
+            $newGeneration[] = $changedGenetic[1];
+        }
+
+        $generations[] = $newGeneration;
+
+        //Fim da segunda geração
+
+        //Gera as outras gerações
+
+        for ($g = 1; $g < self::GENERATIONS_LENGHT - 2; $g++) {
+            $totalFitness  = 0;
+            $arrFitness    = [];
             $newGeneration = [];
 
-            //Populations
-            for ($p = 0; $p < self::POPULATION_LENGHT; $p++) {
-                $fitness = [];
-                $totalFitness = 0;
-
-                //Chromossome
-                for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
-                    $fitnessUnique = $this->fitness($generations[$g][$p][$c]);
-                    $fitness[]     = $fitnessUnique;
-                    $totalFitness  += $fitnessUnique;
-                }
-
-                $taxFitness = $this->calcTaxFitness($fitness, $totalFitness);
-
-                for ($i = 0; $i < (self::POPULATION_LENGHT / 2); $i++) {
-                    //Selected chromossomes to change genetic
-                    $selectedChromossome      = $this->selectChromossome($taxFitness);
-                    $selectedOtherChromossome = $this->selectChromossome($taxFitness);
-
-                    $changed = $this->changeGenetic(
-                        $generations[$g][$p][$selectedChromossome],
-                        $generations[$g][$p][$selectedOtherChromossome]
-                    );
-
-                    $newGeneration[] = $changed[0];
-                    $newGeneration[] = $changed[1];
-                }
+            for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
+                $fitness = $this->fitness($generations[$g][0][$c]);
+                $arrFitness[] = $fitness;
+                $totalFitness += $fitness;
             }
 
-            //Esta gerando uma população de 16!
-            
-            var_dump("<pre>",$newGeneration,"</pre>"); die;
+            $taxFitness = $this->calcTaxFitness($arrFitness, $totalFitness);
+
+            for ($c = 0; $c < self::POPULATION_LENGHT / 2; $c++) {
+                $selectedChromossome      = $this->selectChromossome($taxFitness);
+                $selectedOtherChromossome = $this->selectChromossome($taxFitness);
+
+                $changedGenetic = $this->changeGenetic(
+                    $generations[0][0][$selectedChromossome],
+                    $generations[0][0][$selectedOtherChromossome]
+                );
+
+                $newGeneration[] = $changedGenetic[0];
+                $newGeneration[] = $changedGenetic[1];
+            }
 
             $generations[] = $newGeneration;
         }
 
         var_dump("<pre>",$generations,"</pre>"); die;
-    }
-
-    public function population($populations)
-    {
-        $fitness       = [];
-        $totalFitness  = 0;
-        $taxFitnes     = [];
-
-        //Populations
-        for ($j = 0; $j < self::POPULATION_LENGHT; $j++) {
-             //Chromossome / individual
-            for ($k = 0; $k < self::POPULATION_LENGHT; $k++) {
-                //Fitness of chromossome
-//                $fitnessUnique        = $this->fitness($generations[$i][$j]);
-//                $fitness[$i][$j][$k]  = $fitnessUnique;
-//                $totalFitness        += $fitnessUnique;
-
-            }
-            $taxFitnes[] = $this->calcTaxFitness($fitness[$i], $totalFitness);
-            $totalFitness = 0;
-        }
-
-//        var_dump("<pre>",$generations[0], $fitness[0], $taxFitnes[0],"</pre>"); die;
     }
 
     // Generates the first generation with random numbers
@@ -152,11 +157,11 @@ class Generations
     }
 
     //Calculate the band on each fitness is
-    public function calcTaxFitness($fitness, $totalFitness)
+    public function calcTaxFitness($fitnessPerPopulation, $totalFitness)
     {
         $taxFitness = [];
 
-        foreach ($fitness as $fit) {
+        foreach ($fitnessPerPopulation as $fit) {
             $taxFitness[]  = round(($fit / $totalFitness) * 100, 2);
         }
 
