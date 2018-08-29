@@ -22,21 +22,13 @@ class Generations
     public function generations()
     {
 //        $generations   = [];
-//        $generations[][] = $this->firstPopulation();
-        $generations[] = [
-            0 => [
-                '1001', // 9
-                '0011',
-                '1010',
-                '0101',
-            ],
-//            0 => [
-//                '0101',
-//                '1010',
-//                '1111',
-//                '0000',
-//            ],
-        ];
+        $generations[] = $this->firstPopulation();
+//        $generations[] = [
+//            '1001', // 9
+//            '0011',
+//            '1010',
+//            '0101',
+//        ];
 
         $totalFitness = 0;
         $arrFitness = [];
@@ -46,7 +38,7 @@ class Generations
 
         //Chromossome
         for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
-            $fitness = $this->fitness($generations[0][0][$c]);
+            $fitness = $this->fitness($generations[0][$c]);
             $arrFitness[] = $fitness;
             $totalFitness += $fitness;
         }
@@ -58,8 +50,8 @@ class Generations
             $selectedOtherChromossome = $this->selectChromossome($taxFitness);
 
             $changedGenetic = $this->changeGenetic(
-                $generations[0][0][$selectedChromossome],
-                $generations[0][0][$selectedOtherChromossome]
+                $generations[0][$selectedChromossome],
+                $generations[0][$selectedOtherChromossome]
             );
 
             $newGeneration[] = $changedGenetic[0];
@@ -78,7 +70,7 @@ class Generations
             $newGeneration = [];
 
             for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
-                $fitness = $this->fitness($generations[$g][0][$c]);
+                $fitness = $this->fitness($generations[$g][$c]);
                 $arrFitness[] = $fitness;
                 $totalFitness += $fitness;
             }
@@ -90,8 +82,8 @@ class Generations
                 $selectedOtherChromossome = $this->selectChromossome($taxFitness);
 
                 $changedGenetic = $this->changeGenetic(
-                    $generations[0][0][$selectedChromossome],
-                    $generations[0][0][$selectedOtherChromossome]
+                    $generations[0][$selectedChromossome],
+                    $generations[0][$selectedOtherChromossome]
                 );
 
                 $newGeneration[] = $changedGenetic[0];
@@ -101,7 +93,7 @@ class Generations
             $generations[] = $newGeneration;
         }
 
-        var_dump("<pre>",$generations,"</pre>"); die;
+        var_dump("<pre>",$generations, $arrFitness,"</pre>"); die;
     }
 
     // Generates the first generation with random numbers
