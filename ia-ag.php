@@ -12,7 +12,7 @@ $pop = new Generations();
 class Generations
 {
     const POPULATION_LENGHT = 4;
-    const GENERATIONS_LENGHT = 5;
+    const GENERATIONS_LENGHT = 50;
 
     public function __construct()
     {
@@ -97,6 +97,9 @@ class Generations
         echo "</tr>";
 
         for ($i = 0; $i < self::GENERATIONS_LENGHT - 1; $i++) {
+
+            $mediaFitness = 0;
+
             for ($j = 0; $j < 4; $j++) {
                 echo "<tr>";
                     echo "<td>{$i}</td>";
@@ -106,7 +109,14 @@ class Generations
                     echo "<td>{$arrFitnessTotal[$i][$j]}</td>";
                     echo "<td>{$taxFitnessTotal[$i][$j]}</td>";
                 echo "</tr>";
+
+                $mediaFitness += $arrFitnessTotal[$i][$j];
             }
+
+            $mediaFitness = round($mediaFitness / 4, 2);
+
+            echo "<tr><td colspan='6'>Média Fitness: {$mediaFitness}</td><tr>";
+
             echo "<tr><td colspan='6'>&nbsp;</td><tr>";
         }
         echo "</table>";
