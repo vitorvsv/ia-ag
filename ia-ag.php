@@ -21,50 +21,26 @@ class Generations
 
     public function generations()
     {
-//        $generations   = [];
-        $generations[] = $this->firstPopulation();
-//        $generations[] = [
-//            '1001', // 9
-//            '0011',
-//            '1010',
-//            '0101',
-//        ];
+        //Guarda as gerações
+        $generations[]   = $this->firstPopulation();
 
-        $totalFitness = 0;
-        $arrFitness = [];
+        //Guarda as gerações em decimal
+        $generationDec   = [];
+
+        //Guarda os fitness
+        $arrFitnessTotal = [];
+
+        //Guarda as taxas de fitenss
+        $taxFitnessTotal = [];
+
+        $totalFitness  = 0;
+        $arrFitness    = [];
         $newGeneration = [];
 
-        //segunda geração
-
-        //Chromossome
-        for ($c = 0; $c < self::POPULATION_LENGHT; $c++) {
-            $fitness = $this->fitness($generations[0][$c]);
-            $arrFitness[] = $fitness;
-            $totalFitness += $fitness;
-        }
-
-        $taxFitness = $this->calcTaxFitness($arrFitness, $totalFitness);
-
-        for ($c = 0; $c < self::POPULATION_LENGHT / 2; $c++) {
-            $selectedChromossome      = $this->selectChromossome($taxFitness);
-            $selectedOtherChromossome = $this->selectChromossome($taxFitness);
-
-            $changedGenetic = $this->changeGenetic(
-                $generations[0][$selectedChromossome],
-                $generations[0][$selectedOtherChromossome]
-            );
-
-            $newGeneration[] = $changedGenetic[0];
-            $newGeneration[] = $changedGenetic[1];
-        }
-
-        $generations[] = $newGeneration;
-
-        //Fim da segunda geração
+        $cont = 0;
 
         //Gera as outras gerações
-
-        for ($g = 1; $g < self::GENERATIONS_LENGHT - 2; $g++) {
+        for ($g = 0; $g < self::GENERATIONS_LENGHT - 1; $g++) {
             $totalFitness  = 0;
             $arrFitness    = [];
             $newGeneration = [];
@@ -75,7 +51,13 @@ class Generations
                 $totalFitness += $fitness;
             }
 
+            //Guarda em um array com os totais dos fitness
+            $arrFitnessTotal[] = $arrFitness;
+
             $taxFitness = $this->calcTaxFitness($arrFitness, $totalFitness);
+
+            //Guarda em um array com os totais das faixas de fitness
+            $taxFitnessTotal[] = $taxFitness;
 
             for ($c = 0; $c < self::POPULATION_LENGHT / 2; $c++) {
                 $selectedChromossome      = $this->selectChromossome($taxFitness);
@@ -93,7 +75,41 @@ class Generations
             $generations[] = $newGeneration;
         }
 
-        var_dump("<pre>",$generations, $arrFitness,"</pre>"); die;
+        //Gera as populações em decimais
+        foreach ($generations as $g => $generation) {
+            $population = [];
+
+            foreach ($generation as $chromossome) {
+                $population[] = $this->bin4Dec($chromossome);
+            }
+
+            $generationDec[] = $population;
+        }
+
+        echo "<table border='1' style='text-align: center;'>";
+        echo "<tr>";
+            echo "<th>Geração</th>";
+            echo "<th>Valor x</th>";
+            echo "<th>Valor em decimal</th>";
+            echo "<th>Valor em sin(x)</th>";
+            echo "<th>Fitness</th>";
+            echo "<th>Taxa de Fitness</th>";
+        echo "</tr>";
+
+        for ($i = 0; $i < self::GENERATIONS_LENGHT - 1; $i++) {
+            for ($j = 0; $j < 4; $j++) {
+                echo "<tr>";
+                    echo "<td>{$i}</td>";
+                    echo "<td>{$generations[$i][$j]}</td>";
+                    echo "<td>{$generationDec[$i][$j]}</td>";
+                    echo "<td>" . sin($generationDec[$i][$j]) . "</td>";
+                    echo "<td>{$arrFitnessTotal[$i][$j]}</td>";
+                    echo "<td>{$taxFitnessTotal[$i][$j]}</td>";
+                echo "</tr>";
+            }
+            echo "<tr><td colspan='6'>&nbsp;</td><tr>";
+        }
+        echo "</table>";
     }
 
     // Generates the first generation with random numbers
